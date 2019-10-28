@@ -30,62 +30,80 @@ namespace Ejercicio08.ViewModels
         }
         #endregion
 
-        public void OnSelectNumber(object sender, EventArgs e)
+        #region Comandos 
+        public ICommand OnSelectNumber { protected set; get; }
+
+        public ICommand OnSelectOperator { protected set; get; }
+
+        public ICommand OnClear { protected set; get; }
+
+        public ICommand OnCalculate { protected set; get; }
+        #endregion
+
+        #region Constructor
+
+        public OperacionesViewModel()
         {
-            Button button = (Button)sender;
-            string pressed = button.Text;
 
-            if (Valor == "0"|| currentState < 0)
+            OnSelectNumber = new Command(() =>
             {
-                Valor = "";
-                if (currentState < 0)
-                    currentState *= -1;
-            }
+                Button button = (Button)sender;
+                string pressed = button.Text;
 
-            Valor += pressed;
-
-            double number;
-            if (double.TryParse(Valor, out number))
-            {
-                Valor = number.ToString("N0");
-                if (currentState == 1)
+                if (Valor == "0" || currentState < 0)
                 {
-                    firstNumber = number;
+                    Valor = "";
+                    if (currentState < 0)
+                        currentState *= -1;
                 }
-                else
+
+                Valor += pressed;
+
+                double number;
+                if (double.TryParse(Valor, out number))
                 {
-                    secondNumber = number;
+                    Valor = number.ToString("N0");
+                    if (currentState == 1)
+                    {
+                        firstNumber = number;
+                    }
+                    else
+                    {
+                        secondNumber = number;
+                    }
                 }
-            }
-        }
+            });
 
-        public void OnSelectOperator(object sender, EventArgs e)
-        {
-            currentState = -2;
-            Button button = (Button)sender;
-            string pressed = button.Text;
-            mathOperator = pressed;
-        }
-
-        public void OnClear(object sender, EventArgs e)
-        {
-            firstNumber = 0;
-            secondNumber = 0;
-            currentState = 1;
-            Valor = "0";
-        }
-
-        public void OnCalculate(object sender, EventArgs e)
-        {
-            if (currentState == 2)
+            OnSelectOperator = new Command(() =>
             {
-                var result = SimpleCalculator.Calculate(firstNumber, secondNumber, mathOperator);
+                currentState = -2;
+                Button button = (Button)sender;
+                string pressed = button.Text;
+                mathOperator = pressed;
+            });
 
-                Valor = result.ToString();
-                firstNumber = result;
-                currentState = -1;
-            }
-        }       
+            OnClear = new Command(() =>
+            {
+                firstNumber = 0;
+                secondNumber = 0;
+                currentState = 1;
+                Valor = "0";
+            });
+
+            OnCalculate = new Command(() =>
+            {
+                if (currentState == 2)
+                {
+                    var result = SimpleCalculator.Calculate(firstNumber, secondNumber, mathOperator);
+
+                    Valor = result.ToString();
+                    firstNumber = result;
+                    currentState = -1;
+                }
+            });
+
+        }
+        #endregion
 
     }
 }
